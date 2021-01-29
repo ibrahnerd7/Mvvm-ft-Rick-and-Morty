@@ -7,7 +7,8 @@ import java.lang.Exception
 
 /**
  * Created by Ibrah on 1/29/21.
- * This class encapsulates Retrofit responses  into Resource object
+ * This class encapsulates Retrofit responses  in a Resource object to catch
+ * errors nicely
  */
 abstract class BaseDataSource {
     protected suspend fun <T> getResult(call: suspend () -> Response<T>): Resource<T> {
