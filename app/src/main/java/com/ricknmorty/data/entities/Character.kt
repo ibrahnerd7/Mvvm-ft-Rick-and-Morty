@@ -1,11 +1,16 @@
 package com.ricknmorty.data.entities
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 /**
  * Created by Ibrah on 1/29/21.
  */
+@Entity(tableName = "characters")
 data class Character(
     val created: String,
     val gender: String,
+    @PrimaryKey
     val id: Int,
     val image: String,
     val name: String,
