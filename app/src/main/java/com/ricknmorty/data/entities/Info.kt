@@ -1,4 +1,4 @@
-package com.ricknmorty.entities
+package com.ricknmorty.data.entities
 
 /**
  * Created by Ibrah on 1/29/21.
