@@ -2,7 +2,10 @@ package com.ricknmorty
 
 import android.app.Application
 import androidx.viewbinding.BuildConfig
+import dagger.Component
+import dagger.hilt.DefineComponent
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.android.internal.managers.ApplicationComponentManager
 import timber.log.Timber
 
 /**

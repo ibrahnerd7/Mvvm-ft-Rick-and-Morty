@@ -5,56 +5,69 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ricknmorty.R
+import com.ricknmorty.databinding.FragmentCharactersBinding
+import com.ricknmorty.utils.Resource
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CharactersFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class CharactersFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+@AndroidEntryPoint
+class CharactersFragment : Fragment(), CharactersAdapter.CharacterItemListener {
+    private lateinit var binding: FragmentCharactersBinding
+    private val viewModel: CharactersViewModel by viewModels()
+    private lateinit var adapter: CharactersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_characters, container, false)
+        binding = FragmentCharactersBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CharactersFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CharactersFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        viewModel.characters.observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Resource.Status.SUCCESS -> {
+                    binding.progressBar.visibility = View.GONE
+                    if (!it.data.isNullOrEmpty()) adapter.setItems(ArrayList(it.data))
                 }
+                Resource.Status.ERROR ->
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+
+                Resource.Status.LOADING ->
+                    binding.progressBar.visibility = View.VISIBLE
             }
+        })
+    }
+
+    private fun setupRecyclerView() {
+        adapter = CharactersAdapter(this)
+        binding.charactersRv.layoutManager = LinearLayoutManager(requireContext())
+        binding.charactersRv.adapter = adapter
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
+
+    override fun onClickedCharacter(characterId: Int) {
+        findNavController().navigate(
+            R.id.action_charactersFragment_to_characterDetailFragment,
+            bundleOf("id" to characterId)
+        )
     }
 }
