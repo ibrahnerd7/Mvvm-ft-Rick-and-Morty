@@ -1,4 +1,4 @@
-package com.ricknmorty.data.entities.di
+package com.ricknmorty.di
 
 import android.content.Context
 import com.google.gson.Gson
